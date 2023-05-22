@@ -27,6 +27,7 @@ class ModeratorController extends Controller
             'email' => 'required||unique:moderators|email:rfc,dns|max:255'
         ]);
         $moderator = Moderator::create($data);
+        session()->flash('success', 'New moderator was successfully saved.');
         return redirect(route('moderator.index'));
     }
     public function show(Moderator $moderator)
@@ -44,7 +45,8 @@ class ModeratorController extends Controller
         $data = request()->validate([
             'email' => [
                 'required',
-                Rule::unique('moderators')->ignore($moderator->id)
+                Rule::unique('moderators')->ignore($moderator->id),
+                'email:rfc,dns'
             ],
             'name' => [
                 'required',
@@ -59,6 +61,7 @@ class ModeratorController extends Controller
     public function destroy(Moderator $moderator)
     {
         $moderator->delete();
+        session()->flash('success', 'The moderator was successfully deleted.');
         return redirect(route('moderator.index'));
     }
 }
