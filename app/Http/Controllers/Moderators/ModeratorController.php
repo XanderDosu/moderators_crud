@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Moderators;
 
 use App\Http\Controllers\Controller;
 use App\Models\Moderator;
+use Illuminate\Validation\Rule;
 
 class ModeratorController extends Controller
 {
@@ -23,7 +24,7 @@ class ModeratorController extends Controller
     {
         $data = request()->validate([
             'name' => 'required|string|max:255|min:3',
-            'email' => 'required||unique:moderators|email:rfc,dns',
+            'email' => 'required||unique:moderators|email:rfc,dns|max:255'
         ]);
         $moderator = Moderator::create($data);
         return redirect(route('moderator.index'));
@@ -41,8 +42,16 @@ class ModeratorController extends Controller
     public function update(Moderator $moderator)
     {
         $data = request()->validate([
-            'name' => 'required|string|max:255|min:3',
-            'email' => 'required|unique:moderators|email:rfc,dns',
+            'email' => [
+                'required',
+                Rule::unique('moderators')->ignore($moderator->id)
+            ],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'min:3'
+            ]
         ]);
         $moderator->update($data);
         return redirect(route('moderator.show', $moderator->id));
